@@ -143,3 +143,36 @@ class Core_layers(object):
         outputs = act(x)
         return outputs
 
+    @staticmethod
+    def positional_encoding(inputs,
+                        maxlen,
+                        masking=True,
+                        scope="positional_encoding"):
+    
+
+        E = inputs.get_shape().as_list()[-1] # static
+        N, T = tf.shape(inputs)[0], tf.shape(inputs)[1] # dynamic
+        with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
+            # position indices
+            position_ind = tf.tile(tf.expand_dims(tf.range(T), 0), [N, 1]) # (N, T)
+
+            # First part of the PE function: sin and cos argument
+            position_enc = np.array([
+                [pos / np.power(10000, (i-i%2)/E) for i in range(E)]
+                for pos in range(maxlen)])
+
+            # Second part, apply the cosine to even columns and sin to odds.
+            position_enc[:, 0::2] = np.sin(position_enc[:, 0::2])  # dim 2i
+            position_enc[:, 1::2] = np.cos(position_enc[:, 1::2])  # dim 2i+1
+            position_enc = tf.convert_to_tensor(position_enc, tf.float32) # (maxlen, E)
+
+            # lookup
+            outputs = tf.nn.embedding_lookup(position_enc, position_ind)
+
+            # masks
+            if masking:
+                outputs = tf.where(tf.equal(inputs, 0), inputs, outputs)
+
+            return tf.to_float(outputs)
+
+    
