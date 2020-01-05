@@ -10,6 +10,7 @@ import numpy as np
 class graph_preprocessing(object):
     
     @staticmethod
+
     def transform_semi_supervise(labels, mask_nodes_):
 
         # labels : node labels as list [ 1,2,3,4,5]
