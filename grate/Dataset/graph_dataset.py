@@ -49,7 +49,7 @@ class graph_preprocessing(object):
                 'val_mask': val_mask 
                 }
     @staticmethod
-    def sparse_to_tuple(sparse_mx):
+    def sparse_to_tuples(sparse_mx):
         """Convert sparse matrix to tuple representation."""
         def to_tuple(mx):
             if not sp.isspmatrix_coo(mx):
@@ -109,6 +109,15 @@ class graph_preprocessing(object):
         return np.array(mask, dtype=np.bool)
 
     @staticmethod
+    def sparse_to_tuple(sparse_mx):
+        if not sp.isspmatrix_coo(sparse_mx):
+            sparse_mx = sparse_mx.tocoo()
+        coords = np.vstack((sparse_mx.row, sparse_mx.col)).transpose()
+        values = sparse_mx.data
+        shape = sparse_mx.shape
+        return coords, values, shape
+
+    @staticmethod
     def mask_test_edges(adj):
         # Function to build test set with 10% positive links
 
@@ -119,9 +128,9 @@ class graph_preprocessing(object):
         assert np.diag(adj.todense()).sum() == 0
 
         adj_triu = sp.triu(adj)
-        adj_tuple = sparse_to_tuple(adj_triu)
+        adj_tuple = graph_preprocessing.sparse_to_tuple(adj_triu)
         edges = adj_tuple[0]
-        edges_all = sparse_to_tuple(adj)[0]
+        edges_all = graph_preprocessing.sparse_to_tuple(adj)[0]
         num_test = int(np.floor(edges.shape[0] / 10.))
         num_val = int(np.floor(edges.shape[0] / 20.))
 
@@ -214,7 +223,12 @@ class graph_preprocessing(object):
         return {
                 'adj_org': adj_orig.toarray(), 
                 'features': features.toarray(), 
-                'adj_train': adj.toarray()
+                'adj_train': adj.toarray(),
+                'train_edges':train_edges,
+                'val_edges': val_edges,
+                'val_edges_false':val_edges_false,
+                'test_edges':test_edges,
+                'test_edges_false':test_edges_false
                 }
 
 class unsupervised_learning(object):
