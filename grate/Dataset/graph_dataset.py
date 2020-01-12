@@ -206,30 +206,7 @@ class graph_preprocessing(object):
         adj_normalized = adj_.dot(degree_mat_inv_sqrt).transpose().dot(degree_mat_inv_sqrt).tocoo()
         return adj_normalized
 
-    @staticmethod
-    def graph_preprocess_data(adj,features,featureless=False, norm = False):
-    
-        adj_orig = adj
-        adj_orig = adj_orig - sp.dia_matrix((adj_orig.diagonal()[np.newaxis, :], [0]), shape=adj_orig.shape)
-        adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false = graph_preprocessing.mask_test_edges(adj)
-        adj = adj_train
-        
-        if featureless:
-            features = sp.identity(features.shape[0])  # featureless
-            
-        if norm:
-            adj = graph_preprocessing.preprocess_graph(adj)
-            
-        return {
-                'adj_org': adj_orig.toarray(), 
-                'features': features.toarray(), 
-                'adj_train': adj.toarray(),
-                'train_edges':train_edges,
-                'val_edges': val_edges,
-                'val_edges_false':val_edges_false,
-                'test_edges':test_edges,
-                'test_edges_false':test_edges_false
-                }
+
 
 class unsupervised_learning(object):
 
@@ -261,6 +238,32 @@ class unsupervised_learning(object):
         adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
 
         return adj, features
+
+
+    @staticmethod
+    def graph_preprocess_data(adj,features,featureless=False, norm = False):
+    
+        adj_orig = adj
+        adj_orig = adj_orig - sp.dia_matrix((adj_orig.diagonal()[np.newaxis, :], [0]), shape=adj_orig.shape)
+        adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false = graph_preprocessing.mask_test_edges(adj)
+        adj = adj_train
+        
+        if featureless:
+            features = sp.identity(features.shape[0])  # featureless
+            
+        if norm:
+            adj = graph_preprocessing.preprocess_graph(adj)
+            
+        return {
+                'adj_org': adj_orig.toarray(), 
+                'features': features.toarray(), 
+                'adj_train': adj.toarray(),
+                'train_edges':train_edges,
+                'val_edges': val_edges,
+                'val_edges_false':val_edges_false,
+                'test_edges':test_edges,
+                'test_edges_false':test_edges_false
+                }
 
 class semi_supervised_learning(object):
 
