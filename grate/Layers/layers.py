@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 
 class Core_layers(object):
 
