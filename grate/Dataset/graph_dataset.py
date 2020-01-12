@@ -195,7 +195,7 @@ class graph_preprocessing(object):
         rowsum = np.array(adj_.sum(1))
         degree_mat_inv_sqrt = sp.diags(np.power(rowsum, -0.5).flatten())
         adj_normalized = adj_.dot(degree_mat_inv_sqrt).transpose().dot(degree_mat_inv_sqrt).tocoo()
-        return sparse_to_tuple(adj_normalized)
+        return adj_normalized
 
     @staticmethod
     def graph_preprocess_data(adj,features,featureless=False, norm = False):
