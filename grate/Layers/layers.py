@@ -176,4 +176,7 @@ class Core_layers(object):
 
             return tf.to_float(outputs)
 
-    
+class Training(object):
+
+    @staticmethod
+    def fit(epoch, placeholders, all_data, optimizer, )
