@@ -115,8 +115,6 @@ class unsupervised_learning(object):
         # load the data: x, tx, allx, graph
         names = ['x', 'tx', 'allx', 'graph']
         objects = []
-
-        
         for i in range(len(names)):
             with open("./grate/Dataset/raw_datasets/ind.{}.{}".format(dataset, names[i]), 'rb') as f:
                 if sys.version_info > (3, 0):
@@ -224,7 +222,6 @@ class semi_supervised_learning(object):
         print(features.shape)
 
         return adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask
-
 
 
 
