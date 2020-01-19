@@ -1,5 +1,10 @@
 import tensorflow as tf
+from ..model_utils import Accuracy_metrices
+
 import numpy as np
+from tqdm import tqdm
+from tqdm import trange
+import time
 
 class Core_layers(object):
 
@@ -185,4 +190,59 @@ class Core_layers(object):
 class Training(object):
 
     @staticmethod
-    def fit(epoch, placeholders, all_data, optimizer, )
+    def write_result(model_name, result):
+        with open(str(model_name),'a') as f:
+            f.write(str(result)+'\n')
+
+    @staticmethod
+    # data dict names and placeholders name should be same
+    def fit(epochs, model, data, task):
+        
+        feed_dict = dict()
+        for placeholder_name, content in model.placeholders.items():
+                if placeholder_name in data:
+                    feed_dict[content] = data[placeholder_name]
+                    
+        cost_val = []
+        acc_val = []
+        val_roc_score = []
+        
+        # initiating the session 
+        with tf.Session() as sess:
+            sess.run(tf.global_variables_initializer())
+            
+            t = trange(range(epochs), desc='Bar desc', leave=True)
+            
+            if task == 'node_prediction':
+                for epoch in t:
+                    ts = time.time()
+                    outs = sess.run([n for m,n in model.optimizer.items()], feed_dict=feed_dict)
+
+                
+                    avg_cost = outs[1]
+                    avg_accuracy = outs[2]
+                    roc_curr, ap_curr = Accuracy_metrices.get_roc_score(data['val_edges'], data['val_edges_false'],feed_dict = feed_dict, 
+                                                                        placeholders = model.placeholders, sess=sess, model = model, 
+                                                                        adj_orig = data['adj_org'])
+                    val_roc_score.append(roc_curr)
+                    
+                    result_ = ("epoch {},  train_loss {:.5f},  train_acc {:.5f},  val_roc {:.5f}, val_ap{:.5f}, time {:.5f}".format((epoch + 1),
+                                                                                                avg_cost,
+                                                                                                avg_accuracy, 
+                                                                                                            val_roc_score[-1], 
+                                                                                                            ap_curr, 
+                                                                                                (time.time() - ts)))
+                    
+                    t.set_description(result_)
+                    Training.write_result(task, result_)
+                    
+                    t.refresh() # to show immediately the update
+                    
+                    
+                roc_score, ap_score = Accuracy_metrices.get_roc_score(data['test_edges'], data['test_edges_false'],feed_dict = feed_dict, 
+                                                                        placeholders = model.placeholders, sess=sess, model = model, 
+                                                                        adj_orig = data['adj_org'])
+                print('Test ROC score: ' + str(roc_score))
+                print('Test AP score: ' + str(ap_score))
+                Training.write_result(task, roc_score)
+                Training.write_result(task, ap_score)
