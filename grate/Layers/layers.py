@@ -84,7 +84,7 @@ class Core_layers(object):
             outputs += node_features
 
             # layer normaliztion
-            outputs = layer_normalization(outputs)
+            outputs = Core_layers.layer_normalization(outputs)
 
             return outputs
 
