@@ -75,6 +75,12 @@ class Core_layers(object):
             # reshape
             outputs = tf.concat(tf.split(outputs, num_heads, axis=0), axis=2)  # (N, T_q, C)
 
+            # residual connection
+            outputs += node_features
+
+            # layer normaliztion
+            outputs = layer_normalization(outputs)
+
             return outputs
 
     @staticmethod
