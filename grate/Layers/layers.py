@@ -218,14 +218,12 @@ class Training(object):
                     ts = time.time()
                     outs = sess.run([n for m,n in model.optimizer.items()], feed_dict=feed_dict)
 
-                
                     avg_cost = outs[1]
                     avg_accuracy = outs[2]
                     roc_curr, ap_curr = Accuracy_metrices.get_roc_score(data['val_edges'], data['val_edges_false'],feed_dict = feed_dict, 
                                                                         placeholders = model.placeholders, sess=sess, model = model, 
                                                                         adj_orig = data['adj_org'])
                     val_roc_score.append(roc_curr)
-                    
                     result_ = ("epoch {},  train_loss {:.5f},  train_acc {:.5f},  val_roc {:.5f}, val_ap{:.5f}, time {:.5f}".format((epoch + 1),
                                                                                                 avg_cost,
                                                                                                 avg_accuracy, 
@@ -235,7 +233,6 @@ class Training(object):
                     
                     t.set_description(result_)
                     Training.write_result(task, result_)
-                    
                     t.refresh() # to show immediately the update
                     
                     
